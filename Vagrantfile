@@ -67,9 +67,25 @@ Vagrant.configure("2") do |config|
 	      mkdir -p ~root/.ssh
               cp ~vagrant/.ssh/auth* ~root/.ssh
 	      yum install -y mdadm smartmontools hdparm gdisk
-  	  SHELL
+          SHELL
+          
 
+          box.vm.provision "ansible" do |ansible|
+              ansible.playbook = "raid.yml"
+              ansible.groups = {
+              "vb" => ["otuslinux"]  
+              }
+              ansible.extra_vars = {
+              mdadm_arrays: [{
+                name: "md0",
+                devices: ["/dev/sdb", "/dev/sdc", "/dev/sdd", "/dev/sde"],
+                level: "10",
+                filesystem: "ext4",
+                mountpoint: "/mnt/md0",
+                state: "present"
+                }]
+              }
+        end
       end
   end
 end
-
